@@ -6415,5 +6415,288 @@
 })();
 </script>
 
+<!-- ===== EDITORIAL UI OVERHAUL + TOGGLEABLE BREAD MINIGAME PATCH ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+
+<style>
+  /* 1. Editorial Typography & Warm Paper Palette (Anti-"AI" Aesthetic) */
+  html, body {
+    background-color: #F6F4EE !important;
+    color: #18181B !important;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    background-color: #FDFBF7 !important;
+    border-bottom: 1px solid #E4E0D6 !important;
+    height: 56px !important;
+  }
+
+  /* Editorial serif for titles & headings */
+  header .font-extrabold.text-sm,
+  #drawerTitle,
+  #view-planner h2,
+  #view-rewards h2,
+  #filterModal h3,
+  #modalGameTitle,
+  #arcTitle {
+    font-family: 'Fraunces', Georgia, serif !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  /* Replace bubbly rounded-3xl / rounded-full AI cards with crisp architectural corners */
+  .rounded-3xl {
+    border-radius: 10px !important;
+  }
+  .rounded-2xl {
+    border-radius: 8px !important;
+  }
+  .rounded-xl {
+    border-radius: 6px !important;
+  }
+
+  /* Tone down exaggerated AI shadows and rings */
+  .shadow-2xl, .shadow-xl, .shadow-lg {
+    box-shadow: 0 4px 16px rgba(24, 24, 27, 0.08), 0 1px 3px rgba(24, 24, 27, 0.06) !important;
+  }
+
+  /* Kill the AI pulsing dot and noisy gradient overlays */
+  .animate-ping, .animate-pulse {
+    display: none !important;
+  }
+
+  /* Sidebar & Feed cleanup */
+  #discoveryFeedPanel {
+    background-color: #FDFBF7 !important;
+    border-right: 1px solid #E4E0D6 !important;
+  }
+  #spotCardsFeed {
+    background-color: #F6F4EE !important;
+  }
+  #spotCardsFeed article {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E4E0D6 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s ease !important;
+  }
+  #spotCardsFeed article:hover {
+    border-color: #18181B !important;
+  }
+
+  /* Clean Editorial Map Markers (No bouncy cartoon scaling) */
+  .city-hub-marker {
+    border-radius: 6px !important;
+    background: #18181B !important;
+    color: #FAFAF9 !important;
+    border: 1px solid #3F3F46 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18) !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    padding: 4px 9px !important;
+    transition: background 0.15s ease, transform 0.15s ease !important;
+  }
+  .city-hub-marker:hover {
+    transform: translateY(-1px) !important;
+    background: #1E3A8A !important;
+    border-color: #1E3A8A !important;
+  }
+  .city-hub-count {
+    border-radius: 4px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 9.5px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .map-pill-marker {
+    border-radius: 5px !important;
+    background: #FFFFFF !important;
+    color: #18181B !important;
+    border: 1px solid #D4D0C8 !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
+    font-size: 10.5px !important;
+    font-weight: 600 !important;
+    padding: 3px 8px !important;
+    transition: background 0.15s ease, color 0.15s ease !important;
+  }
+  .map-pill-marker:hover,
+  .map-pill-marker.active-pin {
+    transform: translateY(-1px) !important;
+    background: #18181B !important;
+    color: #FFFFFF !important;
+    border-color: #18181B !important;
+  }
+
+  /* Clean Top Nav & Category Buttons */
+  header nav {
+    background-color: #F1EFEA !important;
+    border: 1px solid #E4E0D6 !important;
+    border-radius: 8px !important;
+  }
+  header nav button,
+  .cat-chip,
+  #horizontalCityBar button,
+  #floatingCategoryDock button {
+    border-radius: 6px !important;
+  }
+
+  /* Floating Controls on Map */
+  #overviewHintPill,
+  #floatingCategoryDock,
+  #mapRouteToggleBtn,
+  #liveStreetScanBtn {
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  }
+  #liveStreetScanBtn {
+    background-color: #18181B !important;
+    border: 1px solid #18181B !important;
+  }
+  #liveStreetScanBtn:hover {
+    background-color: #3F3F46 !important;
+  }
+
+  /* 2. Toggleable Bread Minigame CSS */
+  body:not(.bread-mode-active) .pbWild,
+  body:not(.bread-mode-active) #pbFabDex,
+  body:not(.bread-mode-active) #pbNearestBtn,
+  body:not(.bread-mode-active) #pbHeaderDexBtn {
+    display: none !important;
+  }
+
+  #breadModeToggleBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    border: 1px solid #D6D3CD;
+    background: #FFFFFF;
+    color: #52525B;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  #breadModeToggleBtn:hover {
+    border-color: #18181B;
+    color: #18181B;
+  }
+  #breadModeToggleBtn.active {
+    background: #92400E;
+    border-color: #78350F;
+    color: #FFFFFF;
+  }
+  #breadModeToggleDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background: #A1A1AA;
+  }
+  #breadModeToggleBtn.active #breadModeToggleDot {
+    background: #FDE047;
+  }
+</style>
+
+<script>
+(function () {
+  function deAiTextCleanup() {
+    const sub = document.querySelector("header p");
+    if (sub) sub.textContent = "Regional Cartography & Field Guide";
+
+    const hint = document.querySelector("#overviewHintPill span:last-child");
+    if (hint) hint.innerHTML = "Select any of the <strong>18 regional hubs</strong> or filter by category below.";
+
+    const scanSpan = document.querySelector("#liveStreetScanBtn span");
+    if (scanSpan) scanSpan.textContent = "Scan Local Street Places";
+
+    const dockHeader = document.getElementById("floatingDockHeader");
+    if (dockHeader && dockHeader.textContent.includes("Map Pins Hidden")) {
+      dockHeader.innerHTML = "<span>Pins hidden — select a category to display on map:</span>";
+    }
+
+    const cleanLabels = {
+      landmark: "Landmarks",
+      hotel: "Hotels",
+      food: "Food & Cafes",
+      shopping: "Shops"
+    };
+    Object.entries(cleanLabels).forEach(([key, label]) => {
+      const chip = document.querySelector(`.cat-chip[data-cat="${key}"]`);
+      if (chip) {
+        const countSpan = chip.querySelector("span");
+        chip.innerHTML = `${label} `;
+        if (countSpan) chip.appendChild(countSpan);
+      }
+      const dockBtn = document.getElementById(`dock-cat-${key}`);
+      if (dockBtn) {
+        const firstSpan = dockBtn.querySelector("span:first-child");
+        if (firstSpan) firstSpan.textContent = label;
+      }
+    });
+  }
+
+  function initBreadGameToggle() {
+    const nav = document.querySelector("header nav");
+    if (!nav) return setTimeout(initBreadGameToggle, 250);
+
+    const navButtons = Array.from(nav.querySelectorAll("button"));
+    const painDexBtn = navButtons.find(b => b.title === "Pain-dex" || b.textContent.includes("Pain-dex"));
+    const nearestBtn = Array.from(document.querySelectorAll(".pbFab")).find(b => b.textContent.includes("Nearest Bread"));
+
+    if (!painDexBtn) {
+      return setTimeout(initBreadGameToggle, 250);
+    }
+
+    painDexBtn.id = "pbHeaderDexBtn";
+    painDexBtn.style.borderRadius = "6px";
+    if (nearestBtn) nearestBtn.id = "pbNearestBtn";
+
+    if (!document.getElementById("breadModeToggleBtn")) {
+      const toggleBtn = document.createElement("button");
+      toggleBtn.id = "breadModeToggleBtn";
+      toggleBtn.type = "button";
+      toggleBtn.title = "Toggle Bread Catching Minigame (Pain-dex)";
+      toggleBtn.innerHTML = `<span id="breadModeToggleDot"></span><span id="breadModeToggleLabel">Bread Game: OFF</span>`;
+
+      let breadEnabled = false;
+
+      const applyBreadState = (enabled, announce) => {
+        breadEnabled = enabled;
+        document.body.classList.toggle("bread-mode-active", enabled);
+        toggleBtn.classList.toggle("active", enabled);
+        const lbl = document.getElementById("breadModeToggleLabel");
+        if (lbl) lbl.textContent = enabled ? "Bread Game: ON" : "Bread Game: OFF";
+
+        if (!enabled) {
+          if (typeof window.pbClose === "function") window.pbClose();
+          if (typeof window.pbDexClose === "function") window.pbDexClose();
+        }
+        if (announce && typeof window.showAppToast === "function") {
+          window.showAppToast(enabled ? "Pain-dex Bread Hunt Enabled" : "Pain-dex Bread Hunt Hidden");
+        }
+      };
+
+      toggleBtn.addEventListener("click", () => {
+        applyBreadState(!breadEnabled, true);
+      });
+
+      nav.insertBefore(toggleBtn, painDexBtn);
+      applyBreadState(false, false);
+    }
+  }
+
+  window.addEventListener("load", () => {
+    deAiTextCleanup();
+    setTimeout(deAiTextCleanup, 600);
+    setTimeout(initBreadGameToggle, 550);
+  });
+})();
+</script>
 </body>
 </html>
